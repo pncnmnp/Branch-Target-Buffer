@@ -48,8 +48,14 @@ void move_to_head(struct Node **head, int search_tag) {
 
 	if(temp -> next != NULL && temp -> next -> tag == search_tag) {
 		struct Node *tag_frame = temp -> next;
-		temp -> next = tag_frame -> next;
-		tag_frame -> next -> prev = temp;
+		if(tag_frame -> next != NULL) {
+			temp -> next = tag_frame -> next;
+			temp -> next -> prev = temp;
+		}
+
+		else {
+			temp -> next = NULL;
+		}
 
 		tag_frame -> prev = NULL;
 
