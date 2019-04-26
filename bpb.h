@@ -3,6 +3,8 @@
 #include "./doubly_ll.h"
 #include "./btb.h"
 
+size_t curr_size = 0;
+
 int update_hist(int hist, int taken) {
     /*
     taken ->
@@ -54,12 +56,12 @@ void flush_bpb(struct Node **head) {
 	}
 }
 
-void check_hit_bpb(struct Node *head, int search_tag) {
-	struct Node *frame = search_bpb(&head, search_tag);
-	if(frame != NULL && frame -> valid != 0) {
+int check_hit_bpb(struct Node *head, int search_tag) {
+	struct Node *frame = search_bpb(head, search_tag);
+	if(frame != 0 && frame -> valid != 0) {
 		if(frame -> hist >> 1) {
 			move_to_head(&head, frame -> tag);
-			return check_hit_target_addr(frame -> tag); /* yet to be implemented */
+			return check_hit_target_addr(frame -> tag);
 		}
 
 		else
@@ -67,4 +69,21 @@ void check_hit_bpb(struct Node *head, int search_tag) {
 	}
 
 	return 0;
+}
+
+void add_entry(struct Node *head, int tag, int target, size_t size) {
+	int hist = 2; /* we start with 'weakly taken' */
+	int valid = 1;
+	if(curr_size < size) {
+		push(&head, tag, hist, valid);
+		add_target(tag, target);
+		curr_size += 1;
+	}
+
+	else {
+		/* replace the last page */
+		delete_last(&head);
+		push(&head, tag, hist, valid);
+		add_target(tag, target);
+	}
 }

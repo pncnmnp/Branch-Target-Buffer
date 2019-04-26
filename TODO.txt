@@ -1,0 +1,4 @@
+TODO:
+>> Add synchronization
+>> Check if stack implemented with doubly_ll 
+   can be implemented with search time of O(1)
