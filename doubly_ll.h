@@ -4,7 +4,7 @@
 struct Node {
 	int tag;
 	int hist;
-	int valid;
+	int valid; /* 1 is valid, 0 is invalid */
 	struct Node *next, *prev;
 };
 
@@ -86,4 +86,17 @@ void delete_last(struct Node **head) {
 		free(temp -> next);
 		temp -> next = NULL;
 	}
+}
+
+struct Node *search(struct Node **head, int search_tag) {
+	struct Node *temp = (*head);
+
+	while(temp != NULL && temp -> tag != search_tag)
+		temp = temp -> next;
+
+	if(temp != NULL && temp -> tag == search_tag) {
+		return temp;
+	}
+
+	return NULL;
 }

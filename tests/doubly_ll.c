@@ -15,7 +15,7 @@ void choice() {
 	struct Node *head = NULL;
 
 	while(1) {
-		printf("1.push\n2.move to head\n3.delete last\n4.print\nchoose: ");
+		printf("1.push\n2.move to head\n3.delete last\n4.search\n5.print\nchoose: ");
 		scanf("%d", &choice);
 
 		if(choice == 1) {
@@ -37,6 +37,15 @@ void choice() {
 		}
 
 		else if(choice == 4) {
+			int search_tag = 0;
+			printf("enter search_tag: ");
+			scanf("%d", &search_tag);
+			struct Node *temp = search(&head, search_tag);
+			if(temp != NULL)
+				printf("tag: %d, history: %d, valid: %d\n", temp -> tag, temp -> hist, temp -> valid);
+		}
+
+		else if(choice == 5) {
 			print(head);
 		}
 	}
