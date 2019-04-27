@@ -19,7 +19,7 @@ int update_hist(int hist, int taken) {
 
 	if((hist == 0 && taken == 0) || 
 		(hist == 3 && taken == 1))
-		return taken;
+		return hist;
 
 	else if((taken == 1) && 
 			(hist == 0 || hist == 1 || hist == 2))
@@ -29,7 +29,7 @@ int update_hist(int hist, int taken) {
 			(hist == 1 || hist == 2 || hist == 3))
 		hist -= 1;
 
-	return hist >> 1;
+	return hist;
 }
 
 void update_hist_tag(struct Node **head, int search_tag, int taken) {
@@ -59,7 +59,7 @@ void flush_bpb(struct Node **head) {
 int check_hit_bpb(struct Node *head, int search_tag) {
 	struct Node *frame = search_bpb(head, search_tag);
 	if(frame != 0 && frame -> valid != 0) {
-		if(frame -> hist >> 1) {
+		if(frame -> hist >> 1 == 1) {
 			move_to_head(&head, frame -> tag);
 			return check_hit_target_addr(frame -> tag);
 		}
@@ -71,7 +71,7 @@ int check_hit_bpb(struct Node *head, int search_tag) {
 	return 0;
 }
 
-void add_entry(struct Node *head, int tag, int target, size_t size) {
+struct Node *add_entry(struct Node *head, int tag, int target, size_t size) {
 	int hist = 2; /* we start with 'weakly taken' */
 	int valid = 1;
 	if(curr_size < size) {
@@ -83,7 +83,11 @@ void add_entry(struct Node *head, int tag, int target, size_t size) {
 	else {
 		/* replace the last page */
 		delete_last(&head);
+		target_delete();
+
 		push(&head, tag, hist, valid);
 		add_target(tag, target);
 	}
+
+	return head;
 }

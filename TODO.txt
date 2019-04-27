@@ -2,3 +2,5 @@ TODO:
 >> Add synchronization
 >> Check if stack implemented with doubly_ll 
    can be implemented with search time of O(1)
+>> Keeping a 'tail' pointer can make 
+   deleting a frame, O(1) time operation.
