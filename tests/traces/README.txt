@@ -1,0 +1,1 @@
+These traces are taken from https://github.com/devanshdalal/branch-predictor/tree/master/traces.
