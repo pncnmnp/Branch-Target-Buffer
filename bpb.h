@@ -78,7 +78,8 @@ void flush_bpb(struct Node **head) {
 
 int check_hit_bpb(struct Node *head, int search_tag) {
 	/*
-        Returns the target address if hit, else returns 0
+        Returns the target address if hit, 
+        else returns 0.
 	*/
 	struct Node *frame = search_bpb(head, search_tag);
 	if(frame != 0 && frame -> valid != 0) {
