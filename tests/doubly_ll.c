@@ -1,6 +1,6 @@
-#include "../doubly_ll.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "../doubly_ll.h"
 
 void print(struct Node *node) {
 	while(node != NULL) {

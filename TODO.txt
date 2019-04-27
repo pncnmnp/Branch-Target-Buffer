@@ -4,3 +4,4 @@ TODO:
    can be implemented with search time of O(1)
 >> Keeping a 'tail' pointer can make 
    deleting a frame, O(1) time operation.
+>> Add a valid bit to BTB

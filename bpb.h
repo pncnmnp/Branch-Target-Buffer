@@ -3,10 +3,16 @@
 #include "./doubly_ll.h"
 #include "./btb.h"
 
-size_t curr_size = 0;
+/*
+    For LRU page replacement implementation details refer:
+    Silberschatz, Avi; Galvin, Peter; Gagne, Greg (2008). Operating Systems Concepts. John Wiley & Sons. ISBN 0-470-12872-0.
+*/
 
-int update_hist(int hist, int taken) {
+size_t curr_size = 0; /* Implementation is such that this is in sync with BTB*/
+
+int update_hist_2_bit(int hist, int taken) {
     /*
+    2 bit saturating counter
     taken ->
              0 -> not taken
              1 -> taken
@@ -15,8 +21,8 @@ int update_hist(int hist, int taken) {
              1 -> weakly not taken
              2 -> weakly taken
              3 -> strongly taken
+    For visualization see : ./schematics/2bit_saturating_counter.svg ( courtesy : Wikipedia )
     */
-
 	if((hist == 0 && taken == 0) || 
 		(hist == 3 && taken == 1))
 		return hist;
@@ -33,15 +39,22 @@ int update_hist(int hist, int taken) {
 }
 
 void update_hist_tag(struct Node **head, int search_tag, int taken) {
+	/*
+        When the pipeline has to be flushed because of wrong prediction,
+        this function will update the hist bit
+	*/
 	struct Node *frame = (*head);
 	while(frame -> next != NULL && frame -> tag != search_tag)
 		frame = frame -> next;
 
 	if(frame -> next != NULL && frame -> tag == search_tag)
-		frame -> hist = update_hist(frame -> hist, taken);
+		frame -> hist = update_hist_2_bit(frame -> hist, taken);
 }
 
 struct Node *search_bpb(struct Node *head, int tag) {
+	/*
+        Returns 0 if no frame found, else returns frame struct
+	*/
 	struct Node *frame = search(&head, tag);
 	if(frame == NULL)
 		return 0;
@@ -49,29 +62,44 @@ struct Node *search_bpb(struct Node *head, int tag) {
 }
 
 void flush_bpb(struct Node **head) {
+	/*
+        The bpb and btb gets cleared with size being reset to 0
+	*/
 	struct Node *frame = (*head);
 	while(frame != NULL) {
 		frame -> valid = 0;
 		frame = frame -> next;
 	}
+
+	flush_btb();
+
+	curr_size = 0;	/* size of the doubly_ll changed */
 }
 
 int check_hit_bpb(struct Node *head, int search_tag) {
+	/*
+        Returns the target address if hit, else returns 0
+	*/
 	struct Node *frame = search_bpb(head, search_tag);
 	if(frame != 0 && frame -> valid != 0) {
-		if(frame -> hist >> 1 == 1) {
+		/* Checking the MSB bit */
+		if(frame -> hist >> 1) {
+			/* Recently used frame moved to top, 
+			adhering to LRU replacement policy 
+			*/
 			move_to_head(&head, frame -> tag);
 			return check_hit_target_addr(frame -> tag);
 		}
-
-		else
-			return 0;
 	}
 
 	return 0;
 }
 
 struct Node *add_entry(struct Node *head, int tag, int target, size_t size) {
+	/*
+        Adds new entry in btb and bpb,
+        returns the updated head_pointer
+	*/
 	int hist = 2; /* we start with 'weakly taken' */
 	int valid = 1;
 	if(curr_size < size) {
