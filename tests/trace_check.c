@@ -4,7 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include "../bpb.h"
-#define size_bpb 256
+#define size_bpb 2560
 
 int str2int(const char *s) {
 	int res = 0;
@@ -27,7 +27,7 @@ int main(void) {
 	size_t miss_count = 0, count = 0;
 	struct Node *head = NULL;
 
-	fp = fopen("./traces/trace_2", "r");
+	fp = fopen("./traces/trace_6", "r");
 	if (fp == NULL)
 		exit(EXIT_FAILURE);
 
@@ -42,8 +42,8 @@ int main(void) {
 
 		itag = str2int(tag);
 		itarget = rand()%size_bpb;
-		int validity = check_hit_bpb(head, itag);
-		struct Node *search_validity = search_bpb(head, itag);
+		int validity = check_hit_bpb(head, itag); // will provide BTB's target address
+		struct Node *search_validity = search_bpb(head, itag); // will provide the BPB's frame
 		if (search_validity != 0)
 			s_hist = search_validity->hist;
 		else
@@ -53,9 +53,16 @@ int main(void) {
 
 		if(validity == 0 && s_hist == -1) {
 			head = add_entry(head, itag, itarget, size_bpb);
+			// miss_count += 1;
+		}
+
+		if(s_hist >> 1 != last_bit) {
+			// wrong prediction, pipeline is flushed
+			update_hist_tag(&head, itag, last_bit);
 			miss_count += 1;
 		}
-		if(s_hist >> 1 != last_bit)
+
+		else
 			update_hist_tag(&head, itag, last_bit);
 		count += 1;
 	}
