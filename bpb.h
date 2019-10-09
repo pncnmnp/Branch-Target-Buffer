@@ -43,12 +43,10 @@ void update_hist_tag(struct Node **head, int search_tag, int taken) {
         When the pipeline has to be flushed because of wrong prediction,
         this function will update the hist bit
 	*/
-	struct Node *frame = (*head);
-	while(frame -> next != NULL && frame -> tag != search_tag)
-		frame = frame -> next;
-
-	if(frame -> next != NULL && frame -> tag == search_tag)
+	struct Node *frame = search(head, search_tag);
+	if (frame != NULL) {
 		frame -> hist = update_hist_2_bit(frame -> hist, taken);
+	}
 }
 
 struct Node *search_bpb(struct Node *head, int tag) {
